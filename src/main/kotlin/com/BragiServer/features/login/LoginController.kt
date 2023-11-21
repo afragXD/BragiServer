@@ -1,0 +1,58 @@
+package com.BragiServer.features.login
+
+import com.BragiServer.database.tokens.TokenDTO
+import com.BragiServer.database.tokens.Tokens
+import com.BragiServer.database.user.Users
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import java.util.*
+
+class LoginController(val call: ApplicationCall) {
+    private val issuer = "roommyServer"
+    private val jwtSecret = System.getenv("JWT_SECRET")
+    private val algorithm = Algorithm.HMAC512(jwtSecret)
+    suspend fun performLogin(){
+
+        val receive = call.receive<LoginReceiveRemote>()
+
+        val api_key = call.request.headers["Bearer-Authorization"]
+
+        val userDTO = Users.fetchUser(receive.email)
+
+        if (!api_key.equals(System.getenv("API_KEY"))){
+            call.respond(HttpStatusCode.Unauthorized, "Получи токен, еблан")
+        }else if (userDTO == null){
+            call.respond(HttpStatusCode.BadRequest, "User not found")
+        } else{
+            if (userDTO.password == receive.password){
+                //var token = UUID.randomUUID().toString()
+
+                val token = JWT.create()
+                    .withClaim("email", userDTO.email)
+                    .withClaim("username", userDTO.username)
+                    .withClaim("gender", userDTO.gender)
+                    .withExpiresAt(Date(System.currentTimeMillis() + (24 * 60 * 60 * 1000)))
+                    .withIssuer(issuer)
+                    .sign(algorithm)
+
+                Tokens.insert(
+                    TokenDTO(
+                        rowId = UUID.randomUUID().toString(), email = receive.email,
+                        token = token
+                    )
+                )
+
+                call.respond(LoginResponseRemote(token = token))
+
+            }else{
+                call.respond(HttpStatusCode.BadRequest, "Пароль инвалид")
+            }
+        }
+
+    }
+}
+//9 6 12 10 11 10
