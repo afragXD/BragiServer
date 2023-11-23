@@ -1,5 +1,6 @@
 package com.BragiServer
 
+import com.BragiServer.features.books.configureBooksRouting
 import com.BragiServer.features.login.configureLoginRouting
 import com.BragiServer.features.profile.configureProfileRouting
 import com.BragiServer.features.register.configureRegisterRouting
@@ -31,4 +32,6 @@ fun Application.module() {
 
     configureProfileRouting()
     configureUpdate()
+
+    configureBooksRouting()
 }

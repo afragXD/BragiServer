@@ -26,7 +26,7 @@ class ProfileController(private val call: ApplicationCall) {
             }
         }else{
             if (token == null){
-                call.respond(HttpStatusCode.Forbidden, "Еблан входа")
+                call.respond(HttpStatusCode.Forbidden, "Ошибка входа")
             }else {
                 Tokens.fetchOut(token)
                 call.respond(HttpStatusCode.Unauthorized, "Срок действия токена истек")

@@ -26,7 +26,7 @@ class RegisterController(val call: ApplicationCall) {
         val userDTO = Users.fetchUser(registerReceiveRemote.email)
 
         if (!api_key.equals(System.getenv("API_KEY"))){
-            call.respond(HttpStatusCode.Unauthorized, "Получи токен, еблан")
+            call.respond(HttpStatusCode.Unauthorized, "Получи токен")
         }else if (!registerReceiveRemote.email.isValidEmail()){
             call.respond(HttpStatusCode.InternalServerError, "Email не валидный")
         }else if (userDTO != null){

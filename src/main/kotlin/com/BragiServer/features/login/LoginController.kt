@@ -24,7 +24,7 @@ class LoginController(val call: ApplicationCall) {
         val userDTO = Users.fetchUser(receive.email)
 
         if (!api_key.equals(System.getenv("API_KEY"))){
-            call.respond(HttpStatusCode.Unauthorized, "Получи токен, еблан")
+            call.respond(HttpStatusCode.Unauthorized, "Получи токен")
         }else if (userDTO == null){
             call.respond(HttpStatusCode.BadRequest, "User not found")
         } else{

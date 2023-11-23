@@ -12,6 +12,19 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium_stealth import stealth
 
+from database.BookDTO import BookDTO
+from database.db import getConnection, inseriFromParse
+
+from info.getDescription import description
+from info.getName import name
+from info.getName import nameEn
+from info.getImg import src_url
+from info.getRating import rating
+from info.getStatus import status
+from info.getChapters import chapters
+from info.getYear import year
+from info.getAuthor import author
+
 
 def OneG(driver) -> list[str]:
     li: list[str] = []
@@ -30,21 +43,6 @@ def Anti(driver, base_url: str):
     ).click()
 
 
-def Description(driver) -> str:
-    des = WebDriverWait(driver, 5).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="fs-info"]/div[1]/div/div'))
-    ).text
-    return des
-
-
-def src_url(driver) -> str:
-    elem = WebDriverWait(driver, 5).until(
-        EC.presence_of_element_located(
-            (By.XPATH, '//*[@id="dle-content"]/article/main/div[1]/div/div[1]/div[2]/div[1]/a/img'))).get_attribute(
-        "src")
-    return elem
-
-
 def get_count_change(driver) -> int:
     chapters_count = WebDriverWait(driver, 5).until(
         EC.presence_of_element_located((By.XPATH, '//*[@id="fs-info"]/div[2]/ul[1]/li[4]/span/span'))).text
@@ -56,34 +54,37 @@ def get_count_change(driver) -> int:
 
 # opts.add_argument("window-size=1400,600")
 
-d = {
-    # "a-will-eternal":
-    # [
-    # "https://ranobes.com/chapters/a-will-eternal/246198-golossarij.html",1315
-    # ],
-     "Tales_of_Herding_Gods":
-     [
-         "https://ranobes.com/ranobe/53844-tales-of-herding-gods.html",1735
-     ],
-    # "Player who returned":[
-    #   "https://ranobes.com/chapters/player-who-returned-10000-years-later/50777-prolog.html",521
-    # ],
-    # "Outside Of Time": [
-    #     "https://ranobes.com/ranobe/354130-outside-of-time.html", 1482
-    # ],
-    #"Renegade Immortal":[
-    #    "https://ranobes.com/ranobe/799-renegade-immortal.html",2092,
-    #]
-    # "Against the Gods":[
-    #     "https://ranobes.com/chapters/against-the-gods/100834-nprolog.html",2036,
-    # ]
-}
+# d = {
+#     # "a-will-eternal":
+#     # [
+#     # "https://ranobes.com/chapters/a-will-eternal/246198-golossarij.html",1315
+#     # ],
+#     # "Tales_of_Herding_Gods":
+#     # [
+#     #     "https://ranobes.com/ranobe/53844-tales-of-herding-gods.html",1735
+#     # ],
+#     # "Player who returned":[
+#     #   "https://ranobes.com/chapters/player-who-returned-10000-years-later/50777-prolog.html",521
+#     # ],
+#     # "Outside Of Time": [
+#     #     "https://ranobes.com/ranobe/354130-outside-of-time.html", 1482
+#     # ],
+#     #"Renegade Immortal":[
+#     #    "https://ranobes.com/ranobe/799-renegade-immortal.html",2092,
+#     #]
+#     # "Against the Gods":[
+#     #     "https://ranobes.com/chapters/against-the-gods/100834-nprolog.html",2036,
+#     # ]
+# }
 
+d = [
+    "https://ranobes.com/ranobe/50776-player-who-returned-10000-years-later-1.html"
+]
 
 def get_data(n):
     try:
         global d
-        URL = d[n][0]
+        URL = d[0]
         # count = d[n][1]
         opts = Options()
         ua = UserAgent()
@@ -105,12 +106,23 @@ def get_data(n):
 
         # обход анти-бота
         Anti(driver, URL)
-        # description
-        text_description = Description(driver)
-        print(text_description)
-        # img Novel
-        elem = src_url(driver)
-        print(elem)
+        # info
+        dto = BookDTO(
+            name = name(driver),
+            en_name = nameEn(driver),
+            image = src_url(driver),
+            description = description(driver),
+            rating = rating(driver),
+            status = status(driver),
+            chapters = chapters(driver),
+            year = year(driver),
+            author = author(driver)
+        )
+
+
+
+        connection = getConnection()
+        inseriFromParse(dto, connection)
 
         # count chapters-scroll-list
         count = get_count_change(driver)
@@ -118,56 +130,55 @@ def get_data(n):
         WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="fs-chapters"]/div/div[3]/a[1]'))
         ).click()
-        if not (n in os.listdir(path=".")):
-            os.mkdir(n)
+        if not (dto.en_name in os.listdir(path="res\\novel\\")):
+            os.mkdir('res\\novel\\'+dto.en_name)
+        try:
+             file = open(f"res\\novel\\{dto.en_name}\\URL_END.txt", "r")
+        except IOError as e:
+            print(u'не удалось открыть файл')
+            file = open(f"res\\novel\\{dto.en_name}\\URL_END.txt", "w")
+            x = '//*[@id="next"]'
+            ######
+            #driver.find_element(By.XPATH, x).click()
+            for i in range(1, count + 1):
+                li: list[str] = OneG(driver)
+                with open(f"res\\novel\\{dto.en_name}\\{i}.txt", "w", encoding='utf-8') as f:
+                    f.writelines('\n'.join(li))
+                if i == count:
+                    URL = driver.current_url
+                    print(URL)
+                    print(count, URL, file=file)
+                else:
+                    driver.find_element(By.XPATH, x).click()
+                    URL = driver.current_url
+                    print(URL)
         else:
-            try:
-                 file = open(f"{n}\\URL_END.txt", "r")
-            except IOError as e:
-                print(u'не удалось открыть файл')
-                file = open(f"{n}\\URL_END.txt", "w")
-                x = '//*[@id="next"]'
-                ######
-                #driver.find_element(By.XPATH, x).click()
-                for i in range(1, count + 1):
-                    li: list[str] = OneG(driver)
-                    with open(f"{n}\\{i}.txt", "w", encoding='utf-8') as f:
-                        f.writelines('\n'.join(li))
-                    if i == count:
-                        URL = driver.current_url
-                        print(URL)
-                        print(count, URL, file=file)
-                    else:
-                        driver.find_element(By.XPATH, x).click()
-                        URL = driver.current_url
-                        print(URL)
-            else:
-                with file:
-                    print(u'делаем что-то с файлом')
-                    content = file.read()
-            meta=content.split(" ")
+            with file:
+                print(u'делаем что-то с файлом')
+                content = file.read()
+        meta=content.split(" ")
 
-            save_count=int(meta[0])
-            if count>save_count:
-                driver.get(meta[1])
-                x = '//*[@id="next"]'
-                driver.find_element(By.XPATH, x).click()
-                for i in range(save_count+1, count + 1):
-                    li: list[str] = OneG(driver)
-                    with open(f"{n}\\{i}.txt", "w", encoding='utf-8') as f:
-                        f.writelines('\n'.join(li))
+        save_count=int(meta[0])
+        if count>save_count:
+            driver.get(meta[1])
+            x = '//*[@id="next"]'
+            driver.find_element(By.XPATH, x).click()
+            for i in range(save_count+1, count + 1):
+                li: list[str] = OneG(driver)
+                with open(f"res\\novel\\{dto.en_name}\\{i}.txt", "w", encoding='utf-8') as f:
+                    f.writelines('\n'.join(li))
 
-                    if i == count:
-                        URL = driver.current_url
-                        print(URL)
-                        with open(f"{n}\\URL_END.txt", "w", encoding='utf-8') as f1:
-                            print(count, URL, file=f1)
-                    else:
-                        driver.find_element(By.XPATH, x).click()
-                        URL = driver.current_url
-                        print(URL)
-            else:
-                print("актуал")
+                if i == count:
+                    URL = driver.current_url
+                    print(URL)
+                    with open(f"res\\novel\\{dto.en_name}\\URL_END.txt", "w", encoding='utf-8') as f1:
+                        print(count, URL, file=f1)
+                else:
+                    driver.find_element(By.XPATH, x).click()
+                    URL = driver.current_url
+                    print(URL)
+        else:
+            print("актуал")
 
     except Exception as ex:
         print(ex)

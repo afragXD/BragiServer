@@ -35,3 +35,4 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/resources/static/books/Tales_of_Herding_Gods/
+/src/main/resources/static/books/res/novel/
