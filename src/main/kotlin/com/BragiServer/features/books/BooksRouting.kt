@@ -1,22 +1,24 @@
 package com.BragiServer.features.books
 
-import com.BragiServer.features.login.LoginController
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 
 fun Application.configureBooksRouting() {
+    // контроллер 1 действия
     routing {
-        get("/books/menu") {
-            val booksController = BooksMenuController(call)
-            booksController.menuBooks()
-        }
-        get("/books/detail") {
-            val booksController = BooksDetailController(call)
-            booksController.book()
-        }
-        get("/books/search") {
-            val booksSearchController = BooksSearchController(call)
-            booksSearchController.bookSearch()
+        route("/books"){
+            get("/menu") {
+                val booksController = BooksMenuController(call)
+                booksController.menuBooks()
+            }
+            get("/{id}/detail") {
+                val booksController = BooksDetailController(call)
+                booksController.book()
+            }
+            get("/search") {
+                val booksSearchController = BooksSearchController(call)
+                booksSearchController.bookSearch()
+            }
         }
     }
 }

@@ -11,3 +11,10 @@ class BookDTO:
     chapters: int
     year: int
     author: str
+
+
+@dataclass
+class ChapterDTO:
+    chapter_number: int
+    chapter_name: str
+    book_id: int

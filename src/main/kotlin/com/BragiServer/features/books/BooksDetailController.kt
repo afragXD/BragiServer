@@ -8,7 +8,8 @@ import io.ktor.server.response.*
 class BooksDetailController(val call: ApplicationCall) {
     suspend fun book(){
 
-        val receive = call.request.queryParameters["id"]
+        //val receive = call.request.queryParameters["id"]
+        val receive = call.parameters["id"]
         if (receive != null){
             val booksList = Books.getForId(receive.toInt())
             if (booksList != null){

@@ -4,13 +4,9 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class BooksMenuReceiveRemote(
-    var limit: Int,
-)
-
-@Serializable
 data class BooksMenuResponseRemote(
     val id: Int,
+    val description: String,
     val name: String,
     val image: String,
     val rating: Float,

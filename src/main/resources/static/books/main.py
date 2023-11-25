@@ -12,8 +12,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium_stealth import stealth
 
-from database.BookDTO import BookDTO
-from database.db import getConnection, inseriFromParse
+from database.DTO import BookDTO
+from database.DTO import ChapterDTO
+
+
+from database.db import getConnection, inseriFromParse, inseriChapter, getIdFromName
 
 from info.getDescription import description
 from info.getName import name
@@ -24,6 +27,7 @@ from info.getStatus import status
 from info.getChapters import chapters
 from info.getYear import year
 from info.getAuthor import author
+from info.getChapterName import chapterName
 
 
 def OneG(driver) -> list[str]:
@@ -78,13 +82,24 @@ def get_count_change(driver) -> int:
 # }
 
 d = [
-    "https://ranobes.com/ranobe/50776-player-who-returned-10000-years-later-1.html"
+    #"https://ranobes.com/ranobe/53844-tales-of-herding-gods.html",
+    #"https://ranobes.com/ranobe/50776-player-who-returned-10000-years-later-1.html",
+    #"https://ranobes.com/ranobe/20314-solo-leveling.html",
+    #"https://ranobes.com/ranobe/668-warlock-of-the-magus-world.html",
+    #"https://ranobes.com/ranobe/5951-a-will-eternal.html",
+    #"https://ranobes.com/ranobe/4-overlord.html",
+    #"https://ranobes.com/ranobe/151884-the-beginning-after-the-end.html",
+    #"https://ranobes.com/ranobe/206754-falling-in-love-with-the-villainess.html",
+    #"https://ranobes.com/ranobe/231996-coeus.html",
+    #"https://ranobes.com/ranobe/347562-combat-continent.html",
+    "https://ranobes.com/ranobe/134618-lord-of-the-mysteries.html",
+    "https://ranobes.com/ranobe/401486-grandson-of-the-holy-emperor-is-a-necromancer.html",
+    "https://ranobes.com/ranobe/363293-immortal-in-the-magic-world.html",
 ]
 
 def get_data(n):
     try:
-        global d
-        URL = d[0]
+        URL = n
         # count = d[n][1]
         opts = Options()
         ua = UserAgent()
@@ -124,12 +139,22 @@ def get_data(n):
         connection = getConnection()
         inseriFromParse(dto, connection)
 
+        id = getIdFromName(dto.en_name, connection)
+
         # count chapters-scroll-list
         count = get_count_change(driver)
         # переход на первую главу
         WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="fs-chapters"]/div/div[3]/a[1]'))
         ).click()
+
+        dto2 = ChapterDTO(
+            chapter_number= 1,
+            chapter_name=chapterName(driver),
+            book_id= id
+        )
+        inseriChapter(dto2, connection)
+
         if not (dto.en_name in os.listdir(path="res\\novel\\")):
             os.mkdir('res\\novel\\'+dto.en_name)
         try:
@@ -150,6 +175,12 @@ def get_data(n):
                     print(count, URL, file=file)
                 else:
                     driver.find_element(By.XPATH, x).click()
+                    dto2 = ChapterDTO(
+                        chapter_number=i,
+                        chapter_name=chapterName(driver),
+                        book_id=id
+                    )
+                    inseriChapter(dto2, connection)
                     URL = driver.current_url
                     print(URL)
         else:

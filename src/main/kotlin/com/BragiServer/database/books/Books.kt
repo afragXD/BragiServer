@@ -30,6 +30,7 @@ object Books: Table() {
                     .map {
                         BooksMenuResponseRemote(
                             id = it[Books.id],
+                            description = it[description],
                             name = it[name],
                             image = it[image],
                             rating = it[rating],
@@ -74,6 +75,7 @@ object Books: Table() {
                     .map {
                         BooksMenuResponseRemote(
                             id = it[Books.id],
+                            description = it[description],
                             name = it[Books.name],
                             image = it[image],
                             rating = it[rating],
