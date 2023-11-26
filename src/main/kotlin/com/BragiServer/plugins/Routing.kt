@@ -13,3 +13,11 @@ fun Application.configureRouting() {
         }
     }
 }
+
+fun Application.configureTest() {
+    routing {
+        get("/test") {
+            call.respondText("XDDDDD")
+        }
+    }
+}

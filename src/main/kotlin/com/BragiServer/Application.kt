@@ -34,4 +34,7 @@ fun Application.module() {
     configureUpdate()
 
     configureBooksRouting()
+
+
+    configureTest()
 }

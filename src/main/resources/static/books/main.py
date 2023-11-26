@@ -1,5 +1,3 @@
-import shutil
-import time
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -7,7 +5,6 @@ from selenium.webdriver.chrome.options import Options
 from fake_useragent import UserAgent
 from multiprocessing import Pool
 import os
-#import requests
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium_stealth import stealth
@@ -56,31 +53,6 @@ def get_count_change(driver) -> int:
         return 0
 
 
-# opts.add_argument("window-size=1400,600")
-
-# d = {
-#     # "a-will-eternal":
-#     # [
-#     # "https://ranobes.com/chapters/a-will-eternal/246198-golossarij.html",1315
-#     # ],
-#     # "Tales_of_Herding_Gods":
-#     # [
-#     #     "https://ranobes.com/ranobe/53844-tales-of-herding-gods.html",1735
-#     # ],
-#     # "Player who returned":[
-#     #   "https://ranobes.com/chapters/player-who-returned-10000-years-later/50777-prolog.html",521
-#     # ],
-#     # "Outside Of Time": [
-#     #     "https://ranobes.com/ranobe/354130-outside-of-time.html", 1482
-#     # ],
-#     #"Renegade Immortal":[
-#     #    "https://ranobes.com/ranobe/799-renegade-immortal.html",2092,
-#     #]
-#     # "Against the Gods":[
-#     #     "https://ranobes.com/chapters/against-the-gods/100834-nprolog.html",2036,
-#     # ]
-# }
-
 d = [
     #"https://ranobes.com/ranobe/53844-tales-of-herding-gods.html",
     #"https://ranobes.com/ranobe/50776-player-who-returned-10000-years-later-1.html",
@@ -92,9 +64,9 @@ d = [
     #"https://ranobes.com/ranobe/206754-falling-in-love-with-the-villainess.html",
     #"https://ranobes.com/ranobe/231996-coeus.html",
     #"https://ranobes.com/ranobe/347562-combat-continent.html",
-    "https://ranobes.com/ranobe/134618-lord-of-the-mysteries.html",
-    "https://ranobes.com/ranobe/401486-grandson-of-the-holy-emperor-is-a-necromancer.html",
-    "https://ranobes.com/ranobe/363293-immortal-in-the-magic-world.html",
+    #"https://ranobes.com/ranobe/134618-lord-of-the-mysteries.html",
+    #"https://ranobes.com/ranobe/401486-grandson-of-the-holy-emperor-is-a-necromancer.html",
+    #"https://ranobes.com/ranobe/363293-immortal-in-the-magic-world.html",
 ]
 
 def get_data(n):
